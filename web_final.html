@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+</head>
+<body>
+    <header >
+        <div class="container">
+            <div class="row" style="background-color: white">
+                <div class="col-2 p-5">
+{#                    <img src="https://postfiles.pstatic.net/MjAxOTA4MTZfMTA1/MDAxNTY1OTMwMDQ1Nzg5.sIFMT2E6Z4txBvj-g3MBNuhOHIe7lLK2Y-4bOdnISUQg.0Q6V5WT2Ng7cTcNzqpOTuuaEhLmsnddOt9gdUKBFxwcg.PNG.nkhh1203/KakaoTalk_20190816_132938520.png?type=w580"\#}
+{#                         width="200" height="100"  alt="">#}
+                     <img src="/static/img/home_img.png" width="200" height="100"  alt="">
+
+                </div>
+                <div class="col-8 text-center p-3">
+                    <h1>AIoT</h1>
+                    <p style="font-style: italic">How many hours did you work this week?</p>
+                    <p style="font-style: italic; font-size:1.3em">You can check your working time. Try it!!</p>
+                </div>
+                <div style="position:absolute; right:0px; top:0px;">
+                    <p style="font-style: italic">
+                        Produced by 기무경 김선우 김아름 노건훈 정지현
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <section style="background-color: powderblue">
+        <div class="container p-5 ">
+            <div class="row">
+                <div class="col align-self-center">
+                    <h3 class="col text-center">Check Work Time</h3>
+                        <p>
+                        <input type="text" id="emp_id" class="form-control" placeholder="Employee ID">
+                        </p>
+                        <div class="input-group">
+                            <input type="text" id="datepicker1" class="col text-center p-1" placeholder="Start date"> 　~ 　
+                            <input type="text" id="datepicker2" class="col text-center p-1" placeholder="End date">　
+                            <button type="button" id="submit" class="btn btn-primary p-2">CHECK</button>
+                        </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <section style="background-color: powderblue">
+        <div class="container">
+            <div class="row">
+               <div class="col-6" id="myLineChartWrap">
+                    <canvas width="400" height="400" id="myLineChart"></canvas>
+                </div>
+                <div class="col-6" id="myBarChartWrap">
+                    <canvas width="400" height="400" id="myBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer></footer>
+
+{#    달력 생성 코드#}
+    <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+i   ntegrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+    <script>
+        $(function() {
+            $("#datepicker1, #datepicker2").datepicker({
+                dateFormat: 'yy.mm.dd'
+            });
+        });
+    </script>
+
+{#    아래 정의된 함수들로 차트 생성#}
+    <script>
+        $("#submit").click(function() {
+        var emp_id = $("#emp_id").val();
+        var datepicker1 = $("#datepicker1").val();
+        var datepicker2 = $("#datepicker2").val();
+        console.log( "Handler for .click() called." + emp_id +"/" + datepicker1 + "/" + datepicker2);
+        var day_uri= '/work/day/'+emp_id +'/' + datepicker1 + '/' + datepicker2;
+        var week_uri = '/work/week/'+emp_id +'/' + datepicker1 + '/' + datepicker2;
+        getData(day_uri,{},function(data){
+            console.log('daydata',data)
+            console.log('dayparsedata',parseDayData(data));
+            drawLineChart(parseDayData(data));
+        });
+        getData(week_uri,{},function(data){
+            console.log('weekdata',data)
+            console.log('weekparsedata',parseWeekData(data));
+            drawBarChart(parseWeekData(data));
+        });
+
+
+    });
+
+
+        // 함수 1 :데이터호출
+        function getData(uri,data,fun){
+            $.ajax({ //호출하는 부분
+                url:'http://127.0.0.1:5000' + uri,
+                method:"GET",
+                data: JSON.stringify(data),
+                contentType:"application/json"
+            }).done(function (returnData) { //호출에 성공했을 경우
+                if (fun){
+                    fun(returnData);
+            }
+            }).fail(function () { //호출에 실패했을 경우
+                console.log('fail getData');
+            }).always(function (){// 성공여부에 관계없어 실행하고 싶을 때
+            });
+    };
+
+        // 함수 2-1: 일별 데이터 전처리
+        function parseDayData(serverData){
+        var timeList = [];
+        var dateList=[];
+
+
+        for (var data of serverData){
+            timeList.push(((data.working_time)/60/60).toFixed(3)),
+            dateList.push(data.working_date)
+        }
+        var totalList = [timeList,dateList]
+        return totalList;
+    }
+
+        // 함수 2-2: 주별 데이터 전처리
+        function parseWeekData(serverData){
+        var weekList = [];
+        var timeList=[];
+
+        for (var data of serverData){
+            weekList.push(data.month_date), //weeklist x축
+            timeList.push((data.working_time/60/60).toFixed(3))
+        }
+        var totalList = [timeList,weekList]
+        return totalList;
+    }
+
+
+
+        // 함수 3 : 라인차트 생성 함수
+        function drawLineChart(chartData){
+
+        var lineChartCanvasWrap = document.querySelector('#myLineChartWrap');
+        while (lineChartCanvasWrap.firstChild) {
+            lineChartCanvasWrap.removeChild(lineChartCanvasWrap.firstChild);
+        }
+        lineChartCanvasWrap.innerHTML = '<canvas width="400" height="400" id="myLineChart"></canvas>';
+        var lineChartCanvas = lineChartCanvasWrap.firstChild;
+
+        new Chart(lineChartCanvas, {
+            type : 'line',
+            data : {
+                labels: chartData[1], // x축(Day)
+                datasets: [{
+                    data: chartData[0], // y축(근무시간)
+                    label:'Work Time by Day',
+                    backgroundColor: 'rgba(102, 051, 204, 0.5)'
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 10
+                }
+            }]
+        }
+    }
+        });
+    }
+        // 함수 4 : 바 차트 생성 함수
+
+        function drawBarChart(chartData){ //total= [time,week]
+            var barChartCanvasWrap = document.querySelector('#myBarChartWrap');
+            while (barChartCanvasWrap.firstChild) {
+                barChartCanvasWrap.removeChild(barChartCanvasWrap.firstChild);
+            }
+            barChartCanvasWrap.innerHTML = '<canvas width="400" height="400" id="myBarChart"></canvas>';
+            var barChartCanvas = barChartCanvasWrap.firstChild;
+
+            new Chart(barChartCanvas, {
+            type : 'bar',
+            data : {
+                labels: chartData[1],  // x축(Week)
+                datasets: [{
+                    data: chartData[0], // y축(주차별 근무시간)
+                    label:'Work Time by Week',
+                    backgroundColor: 'rgba(23, 18, 171, 0.5)'
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: 40
+                }
+            }]
+        }
+    }
+        });
+Linechart.create();
+    }
+    </script>
+</body>
+</html>

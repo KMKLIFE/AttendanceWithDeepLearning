@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+</head>
+<body>
+    <header >
+        <div class="container">
+            <div class="row" style="background-color: gold">
+                <div class="col-2.5">
+                    <img src="https://postfiles.pstatic.net/20160322_15/mrs0333_1458655784003zNlog_PNG/2016-03-22_23%3B09%3B36.PNG?type=w2"\  width="400" height="230" align="bottom" alt="">
+                </div>
+                <div class="col-2.5 text-center p-4">
+                    <h1>KAKAO</h1>  
+                    <p style="font-style: italic">How many hours did you work this week?</p>
+                    <p style="font-style: italic; font-size:1.3em">You can check your working time. Try it!!</p>
+                </div>
+            </div>
+        </div>
+    </header>
+{#    <section class="bg-light p-5">#}
+{#        <div class="container">#}
+{#            <div class="row">#}
+{#                <div class="col-lg text-center">#}
+{#                    <canvas width="300" height="300" id="myRadarChart"></canvas>#}
+{#                </div>#}
+{#                <div class="col-lg-8 align-self-center">#}
+{#                    <h3>Explore & Connect</h3>#}
+{#                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque enim odio, praesentium sit repellat, #}
+{#                        harum nesciunt esse laboriosam ut saepe id reiciendis consequuntur quia sequi autem explicabo modi temporibus. Saepe.</p>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
+{#    <section>#}
+{#        <div class="container">#}
+{#            <div class="row">#}
+{#                <ul class="col list-group">#}
+{##}
+{#                </ul>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
+    <!-- <section>
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-2 bg-info">
+                    <h4>Explore & Connect</h4>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quasi officia accusantium atque soluta.</p>
+                </div>
+                <div class="col-lg-4 bg-primary" >
+                    <h4>Explore & Connect</h4>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque reiciendis quisquam dolorem magnam tempore tenetur consequatur, mollitia recusandae obcaecati quam molestiae iure! Aliquid excepturi iure porro nihil nostrum molestiae magnam.</p>
+                </div>
+                <div class="col-lg-6 bg-warning" >
+                        <h4>Explore & Connect</h4>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quasi officia accusantium atque soluta.</p>
+            </div>
+        </div>
+    </section> -->
+
+    <section>
+        <div class="container p-5 ">
+            <div class="row">
+                <div class="col align-self-center">
+                    <h3 class="col text-center">Check Work Time</h3>
+                        <p>
+                        <input type="text" id="emp_id" class="form-control" placeholder="Employee ID">
+                        </p>
+                        <div class="input-group">
+                            <input type="text" id="datepicker1" class="col text-center p-1" placeholder="Start date"> ~
+                            <input type="text" id="datepicker2" class="col text-center p-1" placeholder="End date">
+                            <button type="button" id="submit" class="btn btn-warning ">CHECK</button>
+{#                        <button class="input-group-append btn btn-warning ">Check</button>#}
+{#                        <input type="text" class="form-control" placeholder="아이디를 입력하세요">#}
+{#                        <button class="input-group-append btn btn-warning">Register</button>#}
+                        </div>
+                </div>
+{#                <div class="col-6">#}
+{#                    <canvas width="400" height="400" id="myLineChart"></canvas>#}
+{#                </div>#}
+            </div>
+        </div>
+    </section>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-6">
+                    <canvas width="400" height="400" id="myLineChart"></canvas>
+                </div>
+                <div class="col-6">
+                    <canvas width="400" height="400" id="myBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer></footer>
+
+{#    달력 생성 코드#}
+    <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+i   ntegrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+    <script>
+        $(function() {
+            $("#datepicker1, #datepicker2").datepicker({
+                dateFormat: 'yy.mm.dd'
+            });
+        });
+    </script>
+
+{#    아래 정의된 함수들로 차트 생성#}
+    <script>
+        $("#submit").click(function() {
+        var emp_id = $("#emp_id").val();
+        var datepicker1 = $("#datepicker1").val();
+        var datepicker2 = $("#datepicker2").val();
+        console.log( "Handler for .click() called." + emp_id +"/" + datepicker1 + "/" + datepicker2);
+        var work_uri= '/work/'+emp_id +'/' + datepicker1 + '/' + datepicker2;
+        var week_uri = '/work/week/'+emp_id +'/' + datepicker1 + '/' + datepicker2;
+        getData(work_uri,{},function(data){
+            console.log('daydata',data)
+            console.log('dayparsedata',parseData(data));
+            drawLineChart(parseData(data));
+        });
+        getData(week_uri,{},function(data){
+            console.log('weekdata',data)
+            console.log('weekparsedata',parseData2(data));
+            drawBarChart(parseData2(data));
+        });
+
+
+    });
+        {##}
+        {#getData('/orderitems/BR02/values/latest',{},function(data){#}
+        {#    console.log('data',parseData(data));#}
+        {#    drawList(parseData(data));#}
+        {##}
+        {#    drawRadarChart(parseData(data));#}
+        {# });#}
+        {##}
+        {#getData('/orderitems/BR03/values/1',{},function(data){#}
+        {#    console.log('data',parseData(data));#}
+        {#    drawList(parseData(data));#}
+        {##}
+        {#    drawBarChart(parseData(data));#}
+        {# });#}
+
+        // 함수 1 :데이터호출
+        function getData(uri,data,fun){
+            $.ajax({ //호출하는 부분
+                url:'http://127.0.0.1:5000' + uri,
+                method:"GET",
+                data: JSON.stringify(data),
+                contentType:"application/json"
+            }).done(function (returnData) { //호출에 성공했을 경우
+                if (fun){
+                    fun(returnData);
+            }
+            }).fail(function () { //호출에 실패했을 경우
+                console.log('fail getData');
+            }).always(function (){// 성공여부에 관계없어 실행하고 싶을 때
+
+        });
+    };
+
+        // 함수 2-1: 일별 데이터 전처리
+        function parseData(serverData){
+        var timeList = [];
+        var dateList=[];
+
+        for (var data of serverData){
+            timeList.push((data.working_time)/60/60),
+            dateList.push(data.working_date)
+        }
+        var totalList = [timeList,dateList]
+        return totalList;
+    }
+
+        // 함수 2-2: 주별 데이터 전처리
+        function parseData2(serverData){
+        var weekList = [];
+        var timeList=[];
+
+        for (var data of serverData){
+            weekList.push(data.month_date), //weeklist x축
+            timeList.push(data.working_time/60/60)
+        }
+        var totalList = [timeList,weekList]
+        return totalList;
+    }
+
+        // 함수 3 : 리스트 생성 함수
+        function drawList(chartData) {
+        var list = document.querySelector('.list-group');
+        while (list.firstChild){
+            list.removeChild(list.firstChild);
+        }
+        for (var item of chartData){
+            $(list).append('<li class="list-group-item">'+item+'</li>');
+        }
+    }
+
+        // 함수 4 : 레이터차트 생성 함수
+        function drawRadarChart(chartData){
+        var lineCanvas = document.querySelector('#myRadarChart');
+        new Chart(lineCanvas, {
+            type : 'radar',
+            data : {
+                labels: chartData,
+                datasets: [{
+                    data: chartData,
+                    label:'radarChart',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)'
+                }]
+            }
+        });
+
+    }
+
+
+        // 함수 5 : 라인차트 생성 함수
+        function drawLineChart(chartData){
+        var lineCanvas = document.querySelector('#myLineChart');
+        new Chart(lineCanvas, {
+            type : 'line',
+            data : {
+                labels: chartData[1],
+                datasets: [{
+                    data: chartData[0],
+                    label:'Work Time by Day',
+                    backgroundColor: 'rgba(102, 051, 204, 0.2)'
+                }]
+            }
+        });
+    }
+
+
+    function drawBarChart(chartData){ //total = [date,time]
+        var lineCanvas = document.querySelector('#myBarChart');
+        new Chart(lineCanvas, {
+            type : 'bar',
+            data : {
+                labels: chartData[1],  // x축(00주차)
+                datasets: [{
+                    data: chartData[0], // y축(주차별 근무시간)
+                    label:'Work Time by Day',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)'
+                }]
+            }
+        });
+
+    }
+    </script>
+</body>
+</html>
